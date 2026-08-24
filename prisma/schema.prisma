@@ -1,0 +1,67 @@
+// Temperset Prisma Schema
+// Heat intelligence platform with role-aware profiles
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model UserProfile {
+  id          String   @id @default(cuid())
+  email       String?  @unique
+  name        String?
+  // Role taxonomy: individual | enterprise | government | ngo | architect | logistics | airline | road-constructor | energy-utility | real-estate | agriculture | emergency-services
+  role        String
+  organization String?
+  industry    String?
+  location    String?  // City, State
+  latitude    Float?
+  longitude   Float?
+  // JSON-encoded preferences: sectors of interest, alert thresholds, units
+  preferences String?
+  onboarded   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  chats       ChatMessage[]
+  searches    SavedSearch[]
+  alerts      HeatAlert[]
+}
+
+model ChatMessage {
+  id         String   @id @default(cuid())
+  userId     String
+  category   String   // Which track the chat is in
+  role       String   // user | assistant
+  content    String
+  createdAt  DateTime @default(now())
+
+  user       UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model SavedSearch {
+  id         String   @id @default(cuid())
+  userId     String
+  category   String
+  query      String
+  location   String?
+  createdAt  DateTime @default(now())
+
+  user       UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model HeatAlert {
+  id         String   @id @default(cuid())
+  userId     String
+  category   String
+  location   String
+  threshold  Float    // Temperature threshold in Fahrenheit
+  active     Boolean  @default(true)
+  createdAt  DateTime @default(now())
+
+  user       UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
