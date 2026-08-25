@@ -6,8 +6,11 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  // PostgreSQL via Supabase (works on both local dev and Vercel)
+  provider = "postgresql"
   url      = env("DATABASE_URL")
+  // Supabase pooler uses PgBouncer — required on serverless (Vercel)
+  directUrl = env("DIRECT_DATABASE_URL")
 }
 
 model UserProfile {

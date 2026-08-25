@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: "standalone",
+  // NOTE: Do NOT use output: "standalone" on Vercel — it breaks the build.
+  // Vercel has its own serverless deployment model.
   /* config options here */
   typescript: {
     ignoreBuildErrors: true,
