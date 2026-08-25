@@ -1,0 +1,30 @@
+<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="stemGrad" x1="140" y1="400" x2="300" y2="220" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#3FA9F5"/>
+      <stop offset="100%" stop-color="#FF7A33"/>
+    </linearGradient>
+    <radialGradient id="bgGlow" cx="140" cy="400" r="280" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FF7A33" stop-opacity="0.20"/>
+      <stop offset="100%" stop-color="#FF7A33" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect x="0" y="0" width="512" height="512" rx="96" fill="#0B1420"/>
+  <rect x="1" y="1" width="510" height="510" rx="95" fill="none" stroke="#1B2A3A" stroke-width="2"/>
+  <circle cx="140" cy="400" r="280" fill="url(#bgGlow)"/>
+
+  <!-- one reading -->
+  <path d="M140 400 C 190 340, 230 280, 300 220" stroke="url(#stemGrad)" stroke-width="22" stroke-linecap="round" fill="none"/>
+  <circle cx="140" cy="400" r="14" fill="#3FA9F5"/>
+
+  <!-- forks into three decisions -->
+  <path d="M300 220 C 340 170, 380 130, 420 90" stroke="#FF7A33" stroke-width="11" stroke-linecap="round" fill="none"/>
+  <path d="M300 220 C 350 220, 400 220, 440 220" stroke="#FF3B30" stroke-width="11" stroke-linecap="round" fill="none"/>
+  <path d="M300 220 C 340 260, 380 300, 410 340" stroke="#FFB84D" stroke-width="11" stroke-linecap="round" fill="none"/>
+
+  <circle cx="300" cy="220" r="15" fill="#FF7A33"/>
+  <circle cx="420" cy="90" r="11" fill="#FF7A33"/>
+  <circle cx="440" cy="220" r="11" fill="#FF3B30"/>
+  <circle cx="410" cy="340" r="11" fill="#FFB84D"/>
+</svg>

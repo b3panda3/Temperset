@@ -1,5 +1,6 @@
-// Temperset news aggregator — uses GDELT Project (free, no key) as primary source.
-// Falls back to mock headlines when network is unavailable.
+// Temperset news aggregator.
+// Priority: NewsAPI.org (if key) → GDELT Project (free) → mock headlines.
+// All failures are silent — the demo never breaks.
 
 export interface NewsItem {
   title: string;
@@ -10,40 +11,72 @@ export interface NewsItem {
   category: string;
 }
 
-// GDELT DOC 2.0 API — free, no key, returns news articles matching keywords.
+// NewsAPI.org — 100 req/day free, 1-month history, requires key.
+// Docs: https://newsapi.org/docs/endpoints/everything
+async function fetchNewsApi(query: string, category: string): Promise<NewsItem[] | null> {
+  const apiKey = process.env.NEWS_API_KEY;
+  if (!apiKey) return null;
+  try {
+    const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&language=en&sortBy=publishedAt&pageSize=8&apiKey=${apiKey}`;
+    const res = await fetch(url, {
+      next: { revalidate: 1800 },
+      signal: AbortSignal.timeout(10000),
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    const articles = Array.isArray(data?.articles) ? data.articles : [];
+    if (articles.length === 0) return null;
+    return articles.slice(0, 8).map((a: any): NewsItem => ({
+      title: a.title || "Untitled",
+      url: a.url || "#",
+      source: a.source?.name || a.source?.id || "NewsAPI",
+      publishedAt: a.publishedAt || new Date().toISOString(),
+      snippet: a.description || a.title || "",
+      category,
+    }));
+  } catch {
+    return null;
+  }
+}
+
+// GDELT DOC 2.0 API — free, no key.
 // Docs: https://blog.gdeltproject.org/gdelt-doc-2-0-api-debuts/
 const GDELT_URL = "https://api.gdeltproject.org/api/v2/doc/doc";
-
-export async function fetchCategoryNews(categoryQuery: string, category: string): Promise<NewsItem[]> {
+async function fetchGdelt(query: string, category: string): Promise<NewsItem[] | null> {
   try {
-    const url = `${GDELT_URL}?query=${encodeURIComponent(categoryQuery)}&mode=ArtList&maxrecords=8&format=json&sort=datedesc`;
+    const url = `${GDELT_URL}?query=${encodeURIComponent(query)}&mode=ArtList&maxrecords=8&format=json&sort=datedesc`;
     const res = await fetch(url, {
-      next: { revalidate: 1800 }, // cache 30 min
+      next: { revalidate: 1800 },
       signal: AbortSignal.timeout(8000),
     });
-
-    if (res.ok) {
-      const data = await res.json();
-      const articles = Array.isArray(data?.articles) ? data.articles : [];
-      if (articles.length > 0) {
-        return articles.slice(0, 8).map((a: any): NewsItem => ({
-          title: a.title || "Untitled",
-          url: a.url || "#",
-          source: a.domain || a.sourcecountry || "GDELT",
-          publishedAt: a.seendate || new Date().toISOString(),
-          snippet: (a.socialimage || "") + " " + (a.title || "").slice(0, 180),
-          category,
-        }));
-      }
-    }
-  } catch (e) {
-    console.warn("GDELT fetch failed, using mock news:", e);
+    if (!res.ok) return null;
+    const data = await res.json();
+    const articles = Array.isArray(data?.articles) ? data.articles : [];
+    if (articles.length === 0) return null;
+    return articles.slice(0, 8).map((a: any): NewsItem => ({
+      title: a.title || "Untitled",
+      url: a.url || "#",
+      source: a.domain || a.sourcecountry || "GDELT",
+      publishedAt: a.seendate || new Date().toISOString(),
+      snippet: (a.socialimage || "") + " " + (a.title || "").slice(0, 180),
+      category,
+    }));
+  } catch {
+    return null;
   }
+}
+
+export async function fetchCategoryNews(categoryQuery: string, category: string): Promise<NewsItem[]> {
+  // Try NewsAPI first (more reliable), then GDELT, then mock
+  const newsApi = await fetchNewsApi(categoryQuery, category);
+  if (newsApi && newsApi.length > 0) return newsApi;
+
+  const gdelt = await fetchGdelt(categoryQuery, category);
+  if (gdelt && gdelt.length > 0) return gdelt;
 
   return mockNews(category);
 }
 
-// Mock news — realistic-looking headline templates per category
 function mockNews(category: string): NewsItem[] {
   const now = Date.now();
   const day = 86400000;

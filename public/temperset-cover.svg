@@ -1,0 +1,51 @@
+<svg viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+      <path d="M60 0 L0 0 0 60" fill="none" stroke="#FFFFFF" stroke-opacity="0.035" stroke-width="1"/>
+    </pattern>
+    <radialGradient id="glow" cx="200" cy="560" r="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FF7A33" stop-opacity="0.16"/>
+      <stop offset="100%" stop-color="#FF7A33" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow2" cx="1000" cy="200" r="420" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#3FA9F5" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="#3FA9F5" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="stemGradC" x1="760" y1="480" x2="940" y2="300" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#3FA9F5"/>
+      <stop offset="100%" stop-color="#FF7A33"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="0" y="0" width="1200" height="630" fill="#0B1420"/>
+  <rect x="0" y="0" width="1200" height="630" fill="url(#grid)"/>
+  <circle cx="200" cy="560" r="520" fill="url(#glow)"/>
+  <circle cx="1000" cy="200" r="420" fill="url(#glow2)"/>
+
+  <!-- text block -->
+  <text x="80" y="196" font-family="'JetBrains Mono','IBM Plex Mono',monospace" font-size="18" letter-spacing="4" fill="#3FA9F5">THERMAL INTELLIGENCE, TRANSLATED</text>
+  <text x="76" y="298" font-family="'Space Grotesk','Helvetica Neue',Arial,sans-serif" font-size="104" font-weight="700" fill="#EAF1F6">Temperset</text>
+  <text x="80" y="348" font-family="'Space Grotesk','Helvetica Neue',Arial,sans-serif" font-size="27" fill="#C3D0DA">One number. Three decisions.</text>
+  <text x="80" y="384" font-family="'Space Grotesk','Helvetica Neue',Arial,sans-serif" font-size="18" fill="#7C93A6">Hyperlocal ambient temperature, read for fleets, buildings, and cities.</text>
+
+  <text x="80" y="562" font-family="'JetBrains Mono','IBM Plex Mono',monospace" font-size="14" letter-spacing="1.5" fill="#5A7185">10 MI\u00B2 RESOLUTION  \u00B7  2M AGL  \u00B7  NEAR REAL-TIME  \u00B7  POWERED BY THE FORTYGUARD TEMPERATURE API\u00AE</text>
+
+  <!-- signature: one reading forks into three decisions -->
+  <path d="M760 480 C 820 440, 880 380, 940 300" stroke="url(#stemGradC)" stroke-width="26" stroke-linecap="round" fill="none"/>
+  <circle cx="760" cy="480" r="16" fill="#3FA9F5"/>
+  <text x="760" y="514" text-anchor="middle" font-family="'JetBrains Mono','IBM Plex Mono',monospace" font-size="12" letter-spacing="2" fill="#5A9FD4">AMBIENT TEMP</text>
+
+  <circle cx="940" cy="300" r="18" fill="#FF7A33"/>
+
+  <path d="M940 300 C 990 240, 1040 190, 1080 150" stroke="#FF7A33" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <circle cx="1080" cy="150" r="14" fill="#FF7A33"/>
+  <text x="1102" y="146" font-family="'JetBrains Mono','IBM Plex Mono',monospace" font-size="15" letter-spacing="2" fill="#FF7A33">FLEET</text>
+
+  <path d="M940 300 C 1000 300, 1050 300, 1110 300" stroke="#FF3B30" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <circle cx="1110" cy="300" r="14" fill="#FF3B30"/>
+  <text x="1132" y="296" font-family="'JetBrains Mono','IBM Plex Mono',monospace" font-size="15" letter-spacing="2" fill="#FF3B30">SITES</text>
+
+  <path d="M940 300 C 990 350, 1040 400, 1075 440" stroke="#FFB84D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <circle cx="1075" cy="440" r="14" fill="#FFB84D"/>
+  <text x="1097" y="436" font-family="'JetBrains Mono','IBM Plex Mono',monospace" font-size="15" letter-spacing="2" fill="#FFB84D">CIVIC</text>
+</svg>

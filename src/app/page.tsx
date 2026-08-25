@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, User, ChevronDown, Github, Thermometer } from "lucide-react";
 import * as Icons from "lucide-react";
@@ -48,7 +49,14 @@ export default function Home() {
           {/* Top-center: Brand (mobile-friendly) */}
           <div className="hidden md:flex flex-col items-center pointer-events-none">
             <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/30 backdrop-blur-md border border-white/10">
-              <Thermometer size={14} className="text-orange-400" />
+              <Image
+                src="/temperset-icon.svg"
+                alt="Temperset"
+                width={16}
+                height={16}
+                className="drop-shadow"
+                priority
+              />
               <span className="text-xs font-bold tracking-widest uppercase text-white">
                 Temperset
               </span>
@@ -154,7 +162,7 @@ export default function Home() {
             <FeatureCard
               icon="Bot"
               title="Per-Category AI Analyst"
-              text="Each track has its own chatbot persona powered by Z.ai GLM. Ask anything, get a decision — not a data dump."
+              text="Each track has its own chatbot persona powered by Groq's Llama 3.3 70B. Ask anything, get a decision — not a data dump."
               color="#A78BFA"
             />
           </div>
@@ -186,9 +194,9 @@ export default function Home() {
             <div className="flex flex-wrap gap-2 text-[10px]">
               {[
                 "FortyGuard Temperature API®",
-                "Z.ai GLM-4.5",
+                "Groq Llama 3.3 70B",
+                "NewsAPI.org",
                 "GDELT Project",
-                "Open-Meteo",
                 "OpenStreetMap",
                 "Nominatim",
                 "EPA AirNow",
@@ -215,7 +223,12 @@ export default function Home() {
       <footer className="relative z-10 bg-black/60 backdrop-blur-md border-t border-white/10 px-4 sm:px-6 py-6 mt-auto">
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-white/50">
           <div className="flex items-center gap-2">
-            <Thermometer size={14} className="text-orange-400" />
+            <Image
+              src="/temperset-icon.svg"
+              alt="Temperset"
+              width={14}
+              height={14}
+            />
             <span className="font-semibold text-white/70">Temperset</span>
             <span>· Temperature, Translated</span>
           </div>

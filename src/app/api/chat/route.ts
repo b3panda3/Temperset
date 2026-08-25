@@ -1,6 +1,5 @@
-// Per-category chatbot — uses Z.ai GLM via z-ai-web-dev-sdk when configured,
-// falls back to Groq (free, OpenAI-compatible) when Z.ai is unavailable.
-// Falls back to a deterministic response if both are unavailable.
+// Per-category chatbot — powered by Groq (free, OpenAI-compatible Llama 3.3 70B).
+// Falls back to a deterministic response if Groq is unavailable.
 
 import { NextRequest, NextResponse } from "next/server";
 import { getCategory } from "@/lib/categories";
@@ -41,24 +40,6 @@ function buildSystemPrompt(category: any, role: any, body: ChatRequestBody): str
     .join("\n\n");
 }
 
-// --- Z.ai path ---
-async function callZai(messages: any[]): Promise<string | null> {
-  try {
-    const ZAI = (await import("z-ai-web-dev-sdk")).default;
-    const zai = await ZAI.create();
-    const completion = await zai.chat.completions.create({
-      messages,
-      temperature: 0.7,
-      max_tokens: 600,
-    });
-    return completion.choices?.[0]?.message?.content ?? null;
-  } catch (e) {
-    console.warn("Z.ai unavailable:", e instanceof Error ? e.message : e);
-    return null;
-  }
-}
-
-// --- Groq path (free, OpenAI-compatible) ---
 async function callGroq(messages: any[]): Promise<string | null> {
   const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) return null;
@@ -89,7 +70,6 @@ async function callGroq(messages: any[]): Promise<string | null> {
   }
 }
 
-// --- Deterministic fallback ---
 function fallbackReply(category: any, role: any): string {
   const roleHint = role ? ` For a ${role.label}: ${role.sampleInsight}` : "";
   return `Temperset's ${category.name} analyst is warming up. Here's the headline insight: limit outdoor heat exposure between 12:00–16:00, hydrate every 20 minutes, and reroute via shaded corridors where possible.${roleHint} Re-ask your question in a moment for a tailored breakdown.`;
@@ -111,20 +91,16 @@ export async function POST(req: NextRequest) {
       { role: "user", content: body.message },
     ];
 
-    // Try Z.ai first, then Groq, then deterministic fallback
-    let reply = await callZai(messages);
-    if (!reply) reply = await callGroq(messages);
-    if (!reply) reply = fallbackReply(category, role);
+    // Try Groq first (free, OpenAI-compatible, fast)
+    const reply = await callGroq(messages) ?? fallbackReply(category, role);
 
     return NextResponse.json({
       reply,
       category: body.category,
       timestamp: new Date().toISOString(),
-      provider: process.env.GROQ_API_KEY && !reply.includes("warming up") ? "groq" : "zai",
     });
   } catch (err: any) {
     console.error("Chat API error:", err);
-    const category = getCategory((await req.clone().json().catch(() => ({})).category));
     return NextResponse.json(
       {
         error: "Chat service unavailable",

@@ -1,9 +1,21 @@
 # Temperset — Temperature, Translated.
 
-> **The Operating System for Heat.**
-> One heat data layer. Infinite operational decisions. Temperset translates the same hyperlocal temperature into role-specific actions — for logistics, data centers, city planners, architects, airlines, and everyone in between.
+<p align="center">
+  <img src="public/temperset-logo.svg" alt="Temperset" width="480" />
+</p>
 
-Built for **FortyGuard Hackathon '26 — Building the World's Temperature AI**.
+<p align="center">
+  <strong>The Operating System for Heat.</strong><br/>
+  One heat data layer. Infinite operational decisions. Temperset translates the same hyperlocal temperature into role-specific actions — for logistics, data centers, city planners, architects, airlines, and everyone in between.
+</p>
+
+<p align="center">
+  <img src="public/temperset-cover.svg" alt="Temperset Cover" width="600" />
+</p>
+
+<p align="center">
+  Built for <strong>FortyGuard Hackathon '26 — Building the World's Temperature AI</strong>
+</p>
 
 ---
 
@@ -159,7 +171,7 @@ Each of the 7 tracks has its own chatbot persona powered by an LLM (Z.ai GLM-4.5
 | State | Zustand (client) + TanStack Query (server) |
 | Database | Prisma ORM + SQLite |
 | Maps | Leaflet + react-leaflet + OpenStreetMap |
-| LLM | Z.ai GLM-4.5 (primary) + Groq Llama 3.3 70B (fallback) |
+| LLM | Groq Llama 3.3 70B (free, OpenAI-compatible) |
 | Temperature Data | FortyGuard Temperature API® |
 | News | GDELT Project API |
 | Auth | NextAuth.js v4 (available, not yet wired) |
@@ -176,17 +188,15 @@ Temperset is built entirely on free-tier APIs. **Total cash outlay: $0.**
 | API | Purpose | Env Var | Free Tier Limit | Estimated Usage |
 |---|---|---|---|---|
 | **FortyGuard Temperature API®** | Core heat data (2m ambient, 10mi², real-time + 12hr forecast) | `FORTYGUARD_API_KEY` | Free during 2-week hackathon + trial credits | ~10,000 calls |
-| **Z.ai GLM-4.5** | 7 category chatbots + role curation | `ZAI_API_KEY` + `ZAI_BASE_URL` | Free in dev env (proprietary, has free tier) | ~50,000 calls |
+| **Groq Llama 3.3 70B** | 7 category chatbots + role curation | `GROQ_API_KEY` | Free, ~30 req/min, no credit card | ~50,000 calls |
 
-### LLM Fallback (pick one if Z.ai unavailable)
+### LLM Provider
 
 | API | Purpose | Env Var | Free Tier | Notes |
 |---|---|---|---|---|
-| **Groq** | LLM fallback (Llama 3.3 70B) | `GROQ_API_KEY` | Free, ~30 req/min | OpenAI-compatible, very fast |
+| **Groq** | LLM for all 7 chatbots | `GROQ_API_KEY` | Free, ~30 req/min | OpenAI-compatible, very fast, hosts Llama 3.3 70B (open source) |
 
-> **Is Z.ai GLM open source?** No. Z.ai GLM is a proprietary LLM service from Z.ai (the team behind ChatGLM). The `z-ai-web-dev-sdk` reads credentials from a `.z-ai-config` JSON file (not env vars). It works in this dev environment because the platform pre-provisions the config at `/etc/.z-ai-config`. For local development or Vercel deployment, you need to either:
-> 1. Register at https://chat.z.ai or https://open.bigmodel.cn to get your own Z.ai credentials, create a `.z-ai-config` file in your project root
-> 2. **OR** use Groq as a fully free, open-source-compatible alternative — just set `GROQ_API_KEY` and the chat API will auto-fallback to Groq's Llama 3.3 70B
+> **Why Groq?** Groq hosts Meta's Llama 3.3 70B (open-source model) on its specialized LPU hardware. The free tier is generous (~30 req/min), no credit card needed, OpenAI-compatible API, and the response latency is industry-leading. Get a free key at https://console.groq.com/keys.
 
 ### Supplementary (all optional, have free fallbacks built in)
 
@@ -221,52 +231,35 @@ Temperset is built entirely on free-tier APIs. **Total cash outlay: $0.**
 git clone https://github.com/<your-username>/temperset.git
 cd temperset
 
-# 2. Install dependencies
-bun install
+# 2. Install dependencies (use npm if you don't have bun)
+npm install   # or: bun install
 
 # 3. Copy env example
 cp .env.example .env
 
-# 4. (Optional) Add your FortyGuard API key to .env
-# Without it, the app runs on deterministic mock data — still fully demo-able
-echo 'FORTYGUARD_API_KEY=your_key_here' >> .env
+# 4. Add your keys to .env (at minimum, Groq for the chatbot)
+#    Get a free Groq key at https://console.groq.com/keys
+#    Add: GROQ_API_KEY=gsk_your_key_here
+#    (Optional) FORTYGUARD_API_KEY — without it, mock data is used
 
-# 5. (Optional) Add an LLM key — pick one:
-#   Z.ai: create .z-ai-config (see below) OR
-#   Groq: echo 'GROQ_API_KEY=your_key_here' >> .env
+# 5. Initialize the database (SQLite, zero setup)
+npx prisma generate
+npx prisma db push
 
-# 6. Initialize the database
-bun run db:push
-
-# 7. Start the dev server
-bun run dev
+# 6. Start the dev server
+npm run dev   # or: bun run dev
 ```
 
 Open http://localhost:3000 — you should see the rotating wheel with a dynamic sky background.
 
-### Z.ai Config File (alternative to env vars)
-
-If you want to use Z.ai GLM locally, create a file named `.z-ai-config` in the project root:
-
-```json
-{
-  "baseUrl": "https://open.bigmodel.cn/api/paas/v4",
-  "apiKey": "your_zai_api_key",
-  "chatId": "optional",
-  "userId": "optional"
-}
-```
-
-Get your key at https://open.bigmodel.cn after registering.
-
-### Groq Setup (recommended for Vercel)
+### Groq Setup (the only LLM you need)
 
 1. Go to https://console.groq.com/keys
-2. Create a free account
+2. Create a free account (no credit card required)
 3. Generate an API key
 4. Add to `.env`: `GROQ_API_KEY=gsk_your_key_here`
 
-Groq hosts Llama 3.3 70B (open source) and is OpenAI-compatible. Free tier: ~30 requests/min, no credit card required.
+Groq hosts Llama 3.3 70B (open source) and is OpenAI-compatible. Free tier: ~30 requests/min.
 
 ---
 
@@ -274,37 +267,38 @@ Groq hosts Llama 3.3 70B (open source) and is OpenAI-compatible. Free tier: ~30 
 
 ### Prerequisites
 
-- **Node.js 20+** or **Bun 1.3+** (recommended — faster installs)
-- A terminal with bash
+- **Node.js 20+** (recommended) — download from https://nodejs.org
+- **npm** (ships with Node.js) — or **Bun 1.3+** if you prefer faster installs
+- A terminal (PowerShell, CMD, or Git Bash on Windows)
 
 ### Commands
 
 ```bash
 # Install dependencies
-bun install
+npm install
 
 # Start dev server (auto-runs on port 3000)
-bun run dev
+npm run dev
 
 # Lint check
-bun run lint
+npm run lint
 
 # Push Prisma schema to SQLite (run after changing prisma/schema.prisma)
-bun run db:push
+npx prisma db push
 
 # Generate Prisma client (auto-runs on db:push)
-bun run db:generate
+npx prisma generate
 
-# Production build (NOT recommended in dev — use Vercel for prod)
-bun run build
+# Production build (use Vercel for actual prod — this is for testing only)
+npm run build
 
 # Start production server (after build)
-bun run start
+npm run start
 ```
 
 ### Verifying It Works
 
-After `bun run dev`, open http://localhost:3000. You should see:
+After `npm run dev`, open http://localhost:3000. You should see:
 
 1. A dynamic sky background (changes by time of day)
 2. A slowly rotating wheel with 7 category nodes
@@ -342,12 +336,14 @@ open http://localhost:3000  # macOS
 
 | Issue | Fix |
 |---|---|
-| Port 3000 already in use | `lsof -i :3000` then kill the process, or set `PORT=3001` |
-| Prisma errors | `bun run db:push` to resync schema |
-| Chatbot returns fallback message | Check `.z-ai-config` exists OR `GROQ_API_KEY` is set in `.env` |
-| Map doesn't render | Disable browser extensions; check console for Leaflet errors |
+| `window is not defined` error | This was a Leaflet SSR issue — already fixed via dynamic import. If you see it again, ensure `TrackMap.tsx` uses `next/dynamic` with `ssr: false` |
+| Port 3000 already in use | `netstat -ano | findstr :3000` (Windows) then kill the PID, or use `PORT=3001` |
+| Prisma errors | `npx prisma db push` to resync schema |
+| Chatbot returns fallback message | Check `GROQ_API_KEY` is set in `.env` |
+| Map doesn't render | Disable browser extensions; check browser console for Leaflet errors |
 | Sky mode stuck on auto | Click "Next Sky" to lock to a specific mode, or hover and pick "Auto" |
-| Lint errors | `bun run lint` to see them, then fix |
+| Lint errors | `npm run lint` to see them, then fix |
+| `bun.lock` warning on Windows | Harmless — Next.js noticed a bun.lock outside the repo. Use `npm install` to ignore. |
 
 ---
 
@@ -368,6 +364,8 @@ git branch -M main
 git push -u origin main
 ```
 
+> **Important**: Before committing, ensure `.env` is in `.gitignore` (it is by default — `.env*` is excluded). Never commit real API keys.
+
 ### Step 2: Add FortyGuard as a Collaborator
 
 > Hackathon requirement: add `fortyguard` as a collaborator on your repo.
@@ -376,41 +374,63 @@ git push -u origin main
 2. Click "Add people" → enter `fortyguard`
 3. Send invitation
 
-### Step 3: Deploy on Vercel
+### Step 3: Set Up a Production Database (Supabase — free, recommended)
+
+**Why not SQLite on Vercel?** Vercel serverless functions are stateless — they spin up, handle a request, then spin down. Any file written to disk (including a SQLite database) is **ephemeral** and gets wiped on the next cold start. SQLite works fine for local dev, but on Vercel you need a real hosted database.
+
+**Supabase** provides free hosted Postgres (500MB, 50k monthly active users) and is the recommended path:
+
+1. Go to https://supabase.com and create a free account
+2. Create a new project (any name, e.g., "temperset")
+3. Wait ~2 minutes for provisioning
+4. Go to **Project Settings → Database → Connection string → URI**
+5. Copy the connection string — it looks like:
+   ```
+   postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres
+   ```
+6. Replace `[YOUR-PASSWORD]` with the password you set when creating the project
+
+### Step 4: Switch Prisma to Postgres
+
+Edit `prisma/schema.prisma` — change the datasource provider from `sqlite` to `postgresql`:
+
+```prisma
+datasource db {
+  provider = "postgresql"   // was: sqlite
+  url      = env("DATABASE_URL")
+}
+```
+
+Then run locally to create the tables in Supabase:
+
+```bash
+npx prisma generate
+npx prisma db push
+```
+
+### Step 5: Deploy on Vercel
 
 1. Go to https://vercel.com/new
 2. Import your `temperset` repo
 3. **Framework Preset**: Next.js (auto-detected)
 4. **Root Directory**: `./` (default)
-5. **Build Command**: `bun run build` (auto-detected) or `next build`
-6. **Install Command**: `bun install` (auto-detected)
-7. **Environment Variables** — add these (see `.env.example` for full list):
+5. **Build Command**: `next build` (auto-detected)
+6. **Install Command**: `npm install` (auto-detected)
+7. **Environment Variables** — add these (see [Environment Variables Reference](#environment-variables-reference) below):
 
 | Variable | Value | Required? |
 |---|---|---|
-| `DATABASE_URL` | `file:./db/custom.db` | Yes (SQLite) — Vercel will use a local file |
-| `FORTYGUARD_API_KEY` | Your FortyGuard key | Yes for real data |
-| `GROQ_API_KEY` | Your Groq key | Recommended (for chatbot on Vercel) |
-
-> **Note on Z.ai**: The `z-ai-web-dev-sdk` reads from a `.z-ai-config` file, not env vars. To use Z.ai on Vercel, you'd need to add a build step that writes the config file from env vars. **Recommendation**: Use Groq on Vercel — it's simpler (just set `GROQ_API_KEY`) and equally free.
+| `DATABASE_URL` | Your Supabase Postgres connection string | **Yes** (Vercel won't work with SQLite) |
+| `FORTYGUARD_API_KEY` | Your FortyGuard key (or leave blank to use mock) | Yes for real data |
+| `GROQ_API_KEY` | Your Groq key | **Yes** (chatbot won't work without it) |
+| `NEWS_API_KEY` | Your NewsAPI key | Optional (GDELT fallback works) |
+| `CENSUS_API_KEY` | Your Census key | Optional |
+| `ORS_API_KEY` | Your OpenRouteService key | Optional |
+| `RESEND_API_KEY` | Your Resend key | Optional |
 
 8. Click **Deploy**
 
-### Step 4: Set Up Database (Vercel)
-
-SQLite won't persist across Vercel serverless invocations reliably. For production:
-
-**Option A: Keep SQLite (demo only)** — Works for the hackathon demo since profiles also persist via `localStorage`. Database writes may be ephemeral on Vercel.
-
-**Option B: Switch to Supabase Postgres (free, recommended for production)**:
-1. Create a free Supabase project at https://supabase.com
-2. Get the `DATABASE_URL` from Supabase dashboard
-3. Update `prisma/schema.prisma` datasource to `postgresql`
-4. Set `DATABASE_URL` env var on Vercel to your Supabase connection string
-5. Run `bun run db:push` locally to create tables
-6. Redeploy
-
-### Step 5: Verify Deployment
+### Step 6: Verify Deployment
 
 ```bash
 # After Vercel deploy completes, you'll get a URL like:
@@ -418,7 +438,7 @@ SQLite won't persist across Vercel serverless invocations reliably. For producti
 
 # Test these flows:
 # 1. Landing page loads with rotating wheel
-# 2. Onboarding works
+# 2. Onboarding works (profile saves to Supabase)
 # 3. Heat Pulse widget shows city temps
 # 4. News Radar shows headlines
 # 5. Category deep-dive opens
@@ -426,7 +446,7 @@ SQLite won't persist across Vercel serverless invocations reliably. For producti
 # 7. Maps render on Resilient Cities & Government tracks
 ```
 
-### Step 6: Submit
+### Step 7: Submit
 
 Submit three things to FortyGuard (per hackathon rules):
 1. **Public GitHub repo URL** — `https://github.com/<your-username>/temperset`
@@ -441,42 +461,55 @@ Submit three things to FortyGuard (per hackathon rules):
 
 Create a `.env` file in the project root. See `.env.example` for the full template.
 
-### Required
+### Required for Local Dev
 
 ```bash
-# Database (SQLite by default — no setup needed)
+# Database — SQLite locally (file-based, zero setup)
 DATABASE_URL=file:./db/custom.db
 
-# FortyGuard Temperature API
-FORTYGUARD_API_KEY=your_key_here
+# FortyGuard Temperature API — blank = mock data fallback
+FORTYGUARD_API_KEY=
 FORTYGUARD_BASE_URL=https://api.fortyguard.com/v1
+
+# Groq — required for chatbots to work
+GROQ_API_KEY=gsk_your_key_here
 ```
 
-### LLM Provider (pick at least one)
+### Required for Vercel Production
+
+Replace `DATABASE_URL` with your Supabase Postgres connection string:
 
 ```bash
-# Option A: Z.ai GLM-4.5 (uses .z-ai-config file, not env vars)
-# Create .z-ai-config in project root:
-# {
-#   "baseUrl": "https://open.bigmodel.cn/api/paas/v4",
-#   "apiKey": "your_zai_key",
-#   "chatId": "optional",
-#   "userId": "optional"
-# }
-
-# Option B: Groq (recommended for Vercel — uses env var)
-GROQ_API_KEY=your_groq_key_here
+DATABASE_URL=postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres
 ```
 
-### Optional (all have free fallbacks)
+And update `prisma/schema.prisma` to use `postgresql` instead of `sqlite` (see [Step 4 above](#step-4-switch-prisma-to-postgres)).
+
+### Optional (all have free fallbacks built in)
 
 ```bash
-NEWS_API_KEY=optional_backup_news
-AIRNOW_API_KEY=optional_air_quality
-CENSUS_API_KEY=optional_demographics
-ORS_API_KEY=optional_route_planning
-RESEND_API_KEY=optional_email_alerts
+NEWS_API_KEY=optional_newsapi_key       # NewsAPI primary, GDELT silent fallback
+CENSUS_API_KEY=optional_census_key      # Demographics for heat equity
+ORS_API_KEY=optional_ors_key            # Cool route planning (Track 1)
+RESEND_API_KEY=optional_resend_key      # Email heat alerts
+AIRNOW_API_KEY=optional_airnow_key      # Air quality correlation
 ```
+
+### Full Vercel Environment Variables List
+
+When deploying to Vercel, add these in **Project Settings → Environment Variables**:
+
+| Variable | Value | Required? |
+|---|---|---|
+| `DATABASE_URL` | Supabase Postgres connection string | **Yes** |
+| `FORTYGUARD_API_KEY` | Your FortyGuard key | Yes (or mock) |
+| `GROQ_API_KEY` | Your Groq key | **Yes** |
+| `NEWS_API_KEY` | Your NewsAPI key | Optional |
+| `CENSUS_API_KEY` | Your Census key | Optional |
+| `ORS_API_KEY` | Your ORS key | Optional |
+| `RESEND_API_KEY` | Your Resend key | Optional |
+
+> **Tip**: Set each variable for all three environments (Production, Preview, Development) in Vercel — or just Production if you only care about the live demo.
 
 ---
 
@@ -494,9 +527,9 @@ temperset/
 │   │   ├── page.tsx                   # Single-page orchestrator (the only route)
 │   │   ├── globals.css                # Custom scrollbar, reduced-motion support
 │   │   └── api/
-│   │       ├── chat/route.ts          # LLM chatbot (Z.ai → Groq → fallback)
+│   │       ├── chat/route.ts          # Groq LLM chatbot
 │   │       ├── temperature/route.ts  # FortyGuard proxy (with mock fallback)
-│   │       ├── news/route.ts          # GDELT news fetcher
+│   │       ├── news/route.ts          # NewsAPI → GDELT → mock
 │   │       └── profile/route.ts       # Profile persistence (Prisma)
 │   ├── components/
 │   │   ├── ui/                         # shadcn/ui component library
@@ -508,24 +541,29 @@ temperset/
 │   │       ├── NewsRadarWidget.tsx     # Top-right heat news radar
 │   │       ├── OnboardingModal.tsx     # 16-role selector flow
 │   │       ├── CategoryDeepDive.tsx    # Track-specific deep view
-│   │       ├── TrackMap.tsx            # Leaflet map for tracks 1 & 4
+│   │       ├── TrackMap.tsx            # Leaflet wrapper (ssr: false)
+│   │       ├── TrackMapInner.tsx       # Actual Leaflet map for tracks 1 & 4
 │   │       ├── ChatbotWidget.tsx       # Per-category AI analyst
 │   │       └── NewsSection.tsx        # Per-category news feed
 │   └── lib/
 │       ├── categories.ts               # 7 track definitions (personas, translations, colors)
 │       ├── roles.ts                    # 16 role taxonomy (thresholds, priority categories)
 │       ├── fortyguard.ts               # API client + deterministic mock
-│       ├── news.ts                     # GDELT fetcher + mock fallback
+│       ├── news.ts                     # NewsAPI → GDELT → mock
 │       ├── store.ts                    # Zustand persisted state
 │       ├── db.ts                       # Prisma client
 │       └── utils.ts                    # shadcn/ui utilities
-├── .env.example                        # Full env var template
-├── .env                                # Your local env (not committed)
+├── public/
+│   ├── temperset-logo.svg              # Full logo (README + landing)
+│   ├── temperset-icon.svg              # Favicon + brand badge
+│   ├── temperset-cover.svg             # OG/Twitter card image
+│   └── leaflet-images/                 # Map marker assets
+├── .env.example                        # Full env var template (committed)
+├── .env                                # Your local env (gitignored, never commit)
 ├── package.json
 ├── next.config.ts
 ├── tailwind.config.ts
 ├── tsconfig.json
-├── Caddyfile                           # Gateway config (sandbox only)
 └── README.md                           # This file
 ```
 
@@ -564,9 +602,10 @@ MIT — you keep ownership of your project per hackathon rules. FortyGuard recei
 ## Credits
 
 - **FortyGuard** — Temperature API®, hyperlocal urban heat intelligence (NVIDIA-recognized)
-- **Z.ai** — GLM-4.5 LLM via `z-ai-web-dev-sdk`
-- **Groq** — Llama 3.3 70B (LLM fallback, OpenAI-compatible)
-- **GDELT Project** — Free global news API
+- **Groq** — Free, OpenAI-compatible LLM hosting (Llama 3.3 70B)
+- **Meta** — Llama 3.3 70B (open-source LLM)
+- **NewsAPI.org** — News aggregation API
+- **GDELT Project** — Free global news API (fallback)
 - **OpenStreetMap** — Free, open-source map data
 - **Leaflet** — Open-source JavaScript map library
 - **Next.js** — React framework
@@ -574,6 +613,7 @@ MIT — you keep ownership of your project per hackathon rules. FortyGuard recei
 - **Tailwind CSS** — Styling
 - **Framer Motion** — Animations
 - **Prisma** — ORM
+- **Supabase** — Hosted Postgres (recommended for production)
 - **Vercel** — Deployment platform
 
 ---
