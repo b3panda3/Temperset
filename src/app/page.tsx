@@ -10,6 +10,7 @@ import { HeatPulseWidget } from "@/components/temperset/HeatPulseWidget";
 import { NewsRadarWidget } from "@/components/temperset/NewsRadarWidget";
 import { OnboardingModal } from "@/components/temperset/OnboardingModal";
 import { CategoryDeepDive } from "@/components/temperset/CategoryDeepDive";
+import { BackgroundSwitcher } from "@/components/temperset/BackgroundSwitcher";
 import { useTemperset } from "@/lib/store";
 import { CATEGORIES } from "@/lib/categories";
 
@@ -74,7 +75,7 @@ export default function Home() {
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="absolute top-24 left-0 right-0 text-center px-4"
+              className="absolute top-20 left-0 right-0 text-center px-4 pointer-events-none"
             >
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -99,9 +100,12 @@ export default function Home() {
           )}
         </AnimatePresence>
 
-        {/* The Wheel */}
-        <div className="relative z-10">
+        {/* The Wheel + Background Switcher */}
+        <div className="relative z-10 flex items-center justify-center gap-4 sm:gap-8">
+          <BackgroundSwitcher />
           <CategoryWheel />
+          {/* Spacer on the right to keep wheel centered */}
+          <div className="hidden sm:block w-20" aria-hidden />
         </div>
 
         {/* Sub-call to action */}

@@ -41,16 +41,18 @@ const SKY_PRESETS = {
 export function SkyBackground() {
   // SSR-safe mount detection (avoids setState-in-effect lint error)
   const [mounted, setMounted] = useState(false);
-  const { skyMode, setSkyMode } = useTemperset();
+  const { skyMode, skyAuto, setSkyMode } = useTemperset();
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
-    const update = () => setSkyMode(computeSkyMode(new Date().getHours()));
+    const update = () => {
+      if (skyAuto) setSkyMode(computeSkyMode(new Date().getHours()));
+    };
     update();
     const interval = setInterval(update, 60000);
     return () => clearInterval(interval);
-  }, [setSkyMode]);
+  }, [setSkyMode, skyAuto]);
 
   if (!mounted) return null;
 

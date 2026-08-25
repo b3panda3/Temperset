@@ -40,14 +40,17 @@ interface TempersetState {
   newsOpen: boolean;
   setNewsOpen: (o: boolean) => void;
 
-  // Sky mode (time-based)
+  // Sky mode — supports both auto (time-based) and manual override
   skyMode: "dawn" | "day" | "sunset" | "night";
+  skyAuto: boolean; // true = follow time-of-day, false = user-locked
   setSkyMode: (m: "dawn" | "day" | "sunset" | "night") => void;
+  setSkyAuto: (auto: boolean) => void;
+  cycleSkyMode: () => void; // advance to next preset
 }
 
 export const useTemperset = create<TempersetState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       profile: null,
       setProfile: (p) => set({ profile: p }),
       clearProfile: () => set({ profile: null }),
@@ -65,7 +68,16 @@ export const useTemperset = create<TempersetState>()(
       setNewsOpen: (o) => set({ newsOpen: o }),
 
       skyMode: "day",
-      setSkyMode: (m) => set({ skyMode: m }),
+      skyAuto: true,
+      setSkyMode: (m) => set({ skyMode: m, skyAuto: false }),
+      setSkyAuto: (auto) => set({ skyAuto: auto }),
+      cycleSkyMode: () => {
+        const order = ["dawn", "day", "sunset", "night"] as const;
+        const current = get().skyMode;
+        const idx = order.indexOf(current);
+        const next = order[(idx + 1) % order.length];
+        set({ skyMode: next, skyAuto: false });
+      },
     }),
     {
       name: "temperset-state",

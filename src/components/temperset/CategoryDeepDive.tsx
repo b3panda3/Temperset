@@ -8,6 +8,7 @@ import { getRole } from "@/lib/roles";
 import { useTemperset } from "@/lib/store";
 import { ChatbotWidget } from "./ChatbotWidget";
 import { NewsSection } from "./NewsSection";
+import { TrackMap } from "./TrackMap";
 import * as Icons from "lucide-react";
 
 export function CategoryDeepDive() {
@@ -190,23 +191,47 @@ export function CategoryDeepDive() {
                 </div>
               </section>
 
-              {/* Build examples */}
-              <section>
-                <SectionTitle icon={<Sparkles size={14} />} label="What you can build here" />
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                  {cat.examples.map((ex, i) => (
-                    <div
-                      key={i}
-                      className="rounded-xl border border-white/10 bg-white/5 p-3 hover:border-white/20 hover:bg-white/10 transition-colors"
-                    >
-                      <div className="text-xs font-semibold text-white mb-1">{ex}</div>
-                      <div className="text-[10px] text-white/50">
-                        Example build from the hackathon brief.
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
+              {/* Build examples removed — this is the platform we built, not a hackathon brief */}
+
+              {/* Live map — only for Resilient Cities and Government & Environment */}
+              {(cat.id === "resilient-cities" || cat.id === "government-environment") && (
+                <section>
+                  <SectionTitle
+                    icon={<TrendingUp size={14} />}
+                    label={
+                      cat.id === "resilient-cities"
+                        ? "Heat map & cool corridor planning"
+                        : "Heat vulnerability zones"
+                    }
+                  />
+                  <p className="text-xs text-white/50 mb-3">
+                    {cat.id === "resilient-cities"
+                      ? "Concentric heat tiles around your location. Cyan dashed line marks a suggested cool corridor with ~3°F reduction vs the direct route. Powered by OpenStreetMap."
+                      : "Red zones highlight heat-vulnerable populations: elderly density, no-AC households, and low-income areas. Click markers for details. Powered by OpenStreetMap."}
+                  </p>
+                  <TrackMap
+                    categoryId={cat.id}
+                    lat={profile?.latitude || 33.4484}
+                    lng={profile?.longitude || -112.074}
+                    tempF={tempData?.current?.tempF}
+                    peakF={tempData?.peakF}
+                  />
+                  <div className="mt-2 flex flex-wrap items-center gap-2 text-[10px] text-white/50">
+                    <span className="flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full" style={{ background: "#22d3ee" }} /> Cool (&lt;85°F)
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full" style={{ background: "#fcd34d" }} /> Warm (85–94°F)
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full" style={{ background: "#fb923c" }} /> High (95–104°F)
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full" style={{ background: "#dc2626" }} /> Extreme (≥105°F)
+                    </span>
+                  </div>
+                </section>
+              )}
 
               {/* News section */}
               <section>
